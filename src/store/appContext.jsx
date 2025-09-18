@@ -15,7 +15,13 @@ import {
   getPostById,
   getPostBySlug,
 } from '../services/postsService';
-import { getUsers, getUserById } from '../services/usersService';
+import {
+  getUsers,
+  getUserById,
+  createUser as createUserService,
+  updateUser as updateUserService,
+  deleteUser as deleteUserService,
+} from '../services/usersService';
 import { getSession, login, logout } from '../services/authService';
 import { filterVisiblePosts } from '../services/scheduleService';
 import { slugify, ensureUniqueSlug } from '../utils/slugify';
@@ -182,6 +188,30 @@ export const AppProvider = ({ children }) => {
     [refreshPosts],
   );
 
+  const handleCreateUser = useCallback(
+    (payload) => {
+      createUserService(payload);
+      refreshUsers();
+    },
+    [refreshUsers],
+  );
+
+  const handleUpdateUser = useCallback(
+    (id, payload) => {
+      updateUserService(id, payload);
+      refreshUsers();
+    },
+    [refreshUsers],
+  );
+
+  const handleDeleteUser = useCallback(
+    (id) => {
+      deleteUserService(id);
+      refreshUsers();
+    },
+    [refreshUsers],
+  );
+
   const getVisiblePosts = useCallback(
     ({ categorySlug } = {}) => {
       const categories = state.categories;
@@ -238,6 +268,9 @@ export const AppProvider = ({ children }) => {
       savePost: handleSavePost,
       deletePost: handleDeletePost,
       updatePostStatus: handleUpdatePostStatus,
+      createUser: handleCreateUser,
+      updateUser: handleUpdateUser,
+      deleteUser: handleDeleteUser,
       refreshPosts,
       refreshCategories,
       refreshUsers,
@@ -264,6 +297,9 @@ export const AppProvider = ({ children }) => {
       handleSavePost,
       handleDeletePost,
       handleUpdatePostStatus,
+      handleCreateUser,
+      handleUpdateUser,
+      handleDeleteUser,
       refreshPosts,
       refreshCategories,
       refreshUsers,
