@@ -66,7 +66,7 @@ const PostsList = () => {
   const actions = (
     <Link
       to="/admin/posts/novo"
-      className="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 sm:w-auto"
+      className="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
     >
       Novo post
     </Link>
@@ -80,49 +80,49 @@ const PostsList = () => {
     >
       <section className="space-y-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="grid w-full gap-3 sm:grid-cols-2 sm:gap-4 md:w-auto md:grid-cols-2">
-              <div className="flex flex-col gap-1">
-                <label htmlFor="status" className="text-xs uppercase text-slate-500">
-                  Status
-                </label>
-                <select
-                  id="status"
-                  value={statusFilter}
-                  onChange={(event) => setStatusFilter(event.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                >
-                  <option value="todos">Todos</option>
-                  <option value="publicado">Publicado</option>
-                  <option value="agendado">Agendado</option>
-                  <option value="rascunho">Rascunho</option>
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="categoria" className="text-xs uppercase text-slate-500">
-                  Categoria
-                </label>
-                <select
-                  id="categoria"
-                  value={categoryFilter}
-                  onChange={(event) => setCategoryFilter(event.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-                >
-                  <option value="todas">Todas</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.slug}>
-                      {category.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="status" className="text-xs uppercase text-slate-500">
+                Status
+              </label>
+              <select
+                id="status"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              >
+                <option value="todos">Todos</option>
+                <option value="publicado">Publicado</option>
+                <option value="agendado">Agendado</option>
+                <option value="rascunho">Rascunho</option>
+              </select>
             </div>
-            <Link
-              to="/admin/posts/novo"
-              className="inline-flex w-full items-center justify-center rounded-lg border border-primary-100 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 md:w-auto"
-            >
-              Novo post
-            </Link>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="categoria" className="text-xs uppercase text-slate-500">
+                Categoria
+              </label>
+              <select
+                id="categoria"
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              >
+                <option value="todas">Todas</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.slug}>
+                    {category.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end">
+              <Link
+                to="/admin/posts/novo"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200"
+              >
+                Novo post
+              </Link>
+            </div>
           </div>
         </div>
         <PostTable
