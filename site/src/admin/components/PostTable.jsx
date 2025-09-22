@@ -39,8 +39,8 @@ const PostTable = ({ posts = [], onEdit, onDelete, onChangeStatus }) => {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200">
-      <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+    <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <table className="min-w-[720px] divide-y divide-slate-200 text-left text-sm">
         <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
           <tr>
             <th className="px-4 py-3 font-semibold">Título</th>

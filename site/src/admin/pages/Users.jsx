@@ -135,12 +135,12 @@ const Users = () => {
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <h3 className="text-lg font-semibold text-slate-900">Usuários cadastrados</h3>
             <p className="text-sm text-slate-500">Total: {usersOrdered.length}</p>
           </div>
-          <div className="overflow-hidden rounded-xl border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="min-w-[720px] divide-y divide-slate-200 text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Nome</th>

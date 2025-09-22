@@ -107,7 +107,7 @@ const Categories = () => {
               {feedback.message}
             </div>
           )}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-lg font-semibold text-slate-900">
               {editing ? 'Editar categoria' : 'Nova categoria'}
             </h3>
@@ -115,7 +115,7 @@ const Categories = () => {
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="text-xs font-semibold text-primary-600 hover:underline"
+                className="w-full text-xs font-semibold text-primary-600 hover:underline sm:w-auto"
               >
                 Cancelar edição
               </button>

@@ -219,11 +219,11 @@ const CategoryForm = ({
           Categoria ativa
         </label>
       </div>
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <button
           type="submit"
           disabled={!canSubmit}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {submitLabel}
         </button>

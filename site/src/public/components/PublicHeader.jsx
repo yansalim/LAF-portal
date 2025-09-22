@@ -37,11 +37,11 @@ const PublicHeader = ({ onSearch }) => {
           </button>
         </div>
 
-        <div className="flex flex-1 flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex w-full flex-nowrap items-center gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-end sm:pb-0">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `rounded-full border px-3 py-1 text-sm font-medium transition ${
+              `whitespace-nowrap rounded-full border px-3 py-1 text-sm font-medium transition ${
                 isActive
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-slate-200 text-slate-600 hover:border-primary-400 hover:text-primary-600'
@@ -56,7 +56,7 @@ const PublicHeader = ({ onSearch }) => {
               key={category.id}
               to={`/categoria/${category.slug}`}
               className={({ isActive }) =>
-                `rounded-full border px-3 py-1 text-sm font-medium transition ${
+                `whitespace-nowrap rounded-full border px-3 py-1 text-sm font-medium transition ${
                   isActive
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-slate-200 text-slate-600 hover:border-primary-400 hover:text-primary-600'
@@ -68,7 +68,7 @@ const PublicHeader = ({ onSearch }) => {
           ))}
           <NavLink
             to="/login"
-            className="rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-600 transition hover:border-primary-500 hover:text-primary-600"
+            className="whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-600 transition hover:border-primary-500 hover:text-primary-600"
           >
             Acessar portal
           </NavLink>

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAppContext } from '../../store/appContext';
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   {
     to: '/admin',
     label: 'Dashboard',
@@ -30,18 +30,23 @@ const NAV_ITEMS = [
   },
 ];
 
+export const filterNavItemsByRole = (role) => {
+  if (!role) {
+    return [];
+  }
+  return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
+};
+
 const AdminSidebar = () => {
   const { currentUser } = useAppContext();
 
-  const items = useMemo(() => {
-    if (!currentUser) {
-      return [];
-    }
-    return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(currentUser.role));
-  }, [currentUser]);
+  const items = useMemo(
+    () => filterNavItemsByRole(currentUser?.role),
+    [currentUser?.role],
+  );
 
   return (
-    <aside className="hidden w-60 border-r border-slate-200 bg-white py-6 sm:block">
+    <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white py-6 sm:block">
       <nav className="flex flex-col gap-1 px-4">
         {items.map((item) => (
           <NavLink
