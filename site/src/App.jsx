@@ -53,7 +53,7 @@ const App = () => (
     <Route
       path="/admin/categorias"
       element={(
-        <ProtectedRoute roles={['admin', 'secretaria', 'editor', 'tjd']}>
+        <ProtectedRoute roles={['admin', 'secretaria', 'editor']}>
           <Categories />
         </ProtectedRoute>
       )}
@@ -61,7 +61,7 @@ const App = () => (
     <Route
       path="/admin/usuarios"
       element={(
-        <ProtectedRoute roles={['admin', 'secretaria']}>
+        <ProtectedRoute roles={['admin']}>
           <Users />
         </ProtectedRoute>
       )}

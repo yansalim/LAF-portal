@@ -21,12 +21,12 @@ const NAV_ITEMS = [
   {
     to: '/admin/categorias',
     label: 'Categorias',
-    roles: ['admin', 'secretaria', 'editor', 'tjd'],
+    roles: ['admin', 'secretaria', 'editor'],
   },
   {
     to: '/admin/usuarios',
     label: 'Usuários',
-    roles: ['admin', 'secretaria'],
+    roles: ['admin'],
   },
 ];
 
