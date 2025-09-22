@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+MODE=${1:-serve}
+if [ "$MODE" != "serve" ]; then
+  shift || true
+fi
+
 if [ -z "${DATABASE_URL:-}" ]; then
   echo "DATABASE_URL must be set"
   exit 1
@@ -32,4 +37,30 @@ PY
 
 python -m alembic upgrade head
 python -m src.seed
+
+python <<'PY'
+from src.app_factory import create_app
+from src.services.auth_service import AuthService
+
+credentials = [
+    ("admin@organizacao.local", "123456"),
+    ("secretaria@organizacao.local", "123456"),
+    ("tjd@organizacao.local", "123456"),
+    ("editor@organizacao.local", "123456"),
+]
+
+app = create_app()
+with app.app_context():
+    for email, password in credentials:
+        try:
+            AuthService.login(email, password)
+            print(f"[seed-check] Login OK para {email}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[seed-check] Falha ao validar login para {email}: {exc}")
+PY
+
+if [ "$MODE" = "bootstrap" ]; then
+  exit 0
+fi
+
 exec python -m src.wsgi

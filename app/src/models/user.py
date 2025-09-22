@@ -40,11 +40,18 @@ class User(db.Model):
 
     posts = db.relationship('Post', back_populates='author', lazy='dynamic')
 
+    PASSWORD_METHOD = 'pbkdf2:sha256:600000'
+
     def set_password(self, password: str) -> None:
-        self.password_hash = generate_password_hash(password)
+        cleaned = (password or '').strip()
+        self.password_hash = generate_password_hash(cleaned, method=self.PASSWORD_METHOD)
 
     def check_password(self, password: str) -> bool:
-        return check_password_hash(self.password_hash, password)
+        candidate = (password or '').strip()
+        try:
+            return check_password_hash(self.password_hash, candidate)
+        except ValueError:
+            return False
 
     def to_dict(self) -> dict:
         return {

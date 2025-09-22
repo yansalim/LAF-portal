@@ -34,6 +34,26 @@ make up
 ```
 O comando executa: criação de `.env` (se necessário), criação/atualização de virtualenv, instalação de dependências, migrações, seed e inicialização do servidor. A documentação estará disponível em [`http://localhost:8000/docs`](http://localhost:8000/docs).
 
+### Usuários seed
+Após as migrations o script `src/seed.py` cria perfis básicos e o entrypoint valida o login de cada um automaticamente. Credenciais:
+
+| Nome | E-mail | Senha | Papel | Observações |
+| --- | --- | --- | --- | --- |
+| Ana Administradora | `admin@organizacao.local` | `123456` | `admin` | Acesso total. |
+| Sergio Secretaria | `secretaria@organizacao.local` | `123456` | `secretaria` | Gerencia categorias e posts em qualquer categoria. |
+| Teresa TJD | `tjd@organizacao.local` | `123456` | `tjd` | Apenas categorias `tjd` ou que permitam `tjd`. |
+| Edu Editor | `editor@organizacao.local` | `123456` | `editor` | Limitado a categorias `geral` e `atas`. |
+
+Você pode testar manualmente com cURL:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@organizacao.local","password":"123456"}'
+```
+
+Repita trocando o e-mail para os demais perfis para validar o RBAC.
+
 ## Execução com Docker
 Com Docker e Docker Compose instalados:
 ```bash

@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: laf_mysql
+    command:
+      - --event-scheduler=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: laf_portal
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+
+  bootstrap:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: laf_bootstrap
+    env_file:
+      - app/.env
+    environment:
+      DATABASE_URL: mysql+pymysql://root:pass@db:3306/laf_portal
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["bootstrap"]
+
+  api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: laf_api
+    env_file:
+      - app/.env
+    environment:
+      DATABASE_URL: mysql+pymysql://root:pass@db:3306/laf_portal
+    depends_on:
+      db:
+        condition: service_healthy
+      bootstrap:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/uploads:/app/uploads
+
+volumes:
+  mysql_data:

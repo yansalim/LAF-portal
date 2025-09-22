@@ -11,7 +11,7 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 
-@users_bp.get('/')
+@users_bp.get('')
 @require_roles(UserRole.ADMIN)
 def list_users(current_user):  # noqa: ARG001
     """Lista usuários (admin)
@@ -61,7 +61,7 @@ def list_users(current_user):  # noqa: ARG001
     return paginated_response(users_schema.dump(items), total, page, page_size)
 
 
-@users_bp.post('/')
+@users_bp.post('')
 @require_roles(UserRole.ADMIN)
 def create_user(current_user):  # noqa: ARG001
     """Cria um novo usuário

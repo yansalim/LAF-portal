@@ -12,7 +12,7 @@ post_schema = PostSchema()
 posts_schema = PostSchema(many=True)
 
 
-@posts_bp.get('/')
+@posts_bp.get('')
 @require_authenticated
 def list_posts(current_user):
     """Lista posts com filtros e paginação
@@ -82,7 +82,7 @@ def list_posts(current_user):
     return paginated_response(posts_schema.dump(items), total, page, page_size)
 
 
-@posts_bp.post('/')
+@posts_bp.post('')
 @require_authenticated
 def create_post(current_user):
     """Cria um post

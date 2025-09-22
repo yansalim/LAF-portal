@@ -32,6 +32,7 @@ class UserService:
     @staticmethod
     def create_user(data: dict) -> User:
         payload = UserService.user_create_schema.load(data)
+        payload['password'] = payload['password'].strip()
         role = UserRole(payload['role'])
         if User.query.filter_by(email=payload['email'].lower()).first():
             raise ApiError('EMAIL_EXISTS', 'E-mail já cadastrado', status=409)
@@ -74,7 +75,9 @@ class UserService:
         if 'is_active' in payload:
             user.is_active = payload['is_active']
         if 'password' in payload and payload['password']:
-            user.set_password(payload['password'])
+            payload['password'] = payload['password'].strip()
+            if payload['password']:
+                user.set_password(payload['password'])
         if 'allowed_category_slugs' in payload:
             user.allowed_category_slugs = UserService._sanitize_allowed_categories(user.role, payload['allowed_category_slugs'])
 

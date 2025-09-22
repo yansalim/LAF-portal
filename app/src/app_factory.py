@@ -22,6 +22,11 @@ def create_app(testing: bool = False) -> Flask:
     if testing:
         app.config['TESTING'] = True
 
+    # Accept both `/path` and `/path/` without forcing redirects, which avoids
+    # unnecessary 308 responses that break browser CORS preflight requests in
+    # the frontend.
+    app.url_map.strict_slashes = False
+
     app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
     import os
 

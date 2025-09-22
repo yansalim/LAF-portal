@@ -11,7 +11,7 @@ category_schema = CategorySchema()
 category_list_schema = CategorySchema(many=True)
 
 
-@categories_bp.get('/')
+@categories_bp.get('')
 @require_authenticated
 def list_categories(current_user):
     """Lista paginada de categorias
@@ -66,8 +66,8 @@ def list_categories(current_user):
     return paginated_response(category_list_schema.dump(items), total, page, page_size)
 
 
-@categories_bp.post('/')
-@require_roles(UserRole.ADMIN, UserRole.SECRETARIA)
+@categories_bp.post('')
+@require_roles(UserRole.ADMIN, UserRole.SECRETARIA, UserRole.EDITOR)
 def create_category(current_user):  # noqa: ARG001
     """Cria uma categoria
     ---
@@ -134,7 +134,7 @@ def get_category(identifier: str, current_user):  # noqa: ARG001
 
 
 @categories_bp.put('/<category_id>')
-@require_roles(UserRole.ADMIN, UserRole.SECRETARIA)
+@require_roles(UserRole.ADMIN, UserRole.SECRETARIA, UserRole.EDITOR)
 def update_category(category_id: str, current_user):  # noqa: ARG001
     """Atualiza uma categoria
     ---
@@ -173,7 +173,7 @@ def update_category(category_id: str, current_user):  # noqa: ARG001
 
 
 @categories_bp.delete('/<category_id>')
-@require_roles(UserRole.ADMIN)
+@require_roles(UserRole.ADMIN, UserRole.SECRETARIA, UserRole.EDITOR)
 def delete_category(category_id: str, current_user):  # noqa: ARG001
     """Remove uma categoria
     ---

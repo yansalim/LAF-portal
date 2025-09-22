@@ -240,7 +240,7 @@ class PostService:
 
     @staticmethod
     def _apply_user_scope(query, user: User):
-        if user.role in {UserRole.ADMIN, UserRole.SECRETARIA}:
+        if user.role in {UserRole.ADMIN, UserRole.SECRETARIA, UserRole.EDITOR}:
             return query
         allowed_slugs = set(user.allowed_category_slugs or [])
         if user.role == UserRole.TJD:
@@ -262,25 +262,15 @@ class PostService:
 
     @staticmethod
     def _assert_user_can_write(user: User, category: Category, *, author_id: str) -> None:
-        if user.role in {UserRole.ADMIN, UserRole.SECRETARIA}:
-            return
-
         if not user.is_active:
             raise ApiError('FORBIDDEN', 'Usuário inativo', status=403)
+
+        if user.role in {UserRole.ADMIN, UserRole.SECRETARIA, UserRole.EDITOR}:
+            return
 
         if user.role == UserRole.TJD:
             if category.slug != 'tjd' and (not category.allowed_roles or 'tjd' not in category.allowed_roles):
                 raise ApiError('FORBIDDEN', 'Usuário TJD não pode publicar nesta categoria', status=403)
-            if author_id != user.id:
-                raise ApiError('FORBIDDEN', 'Usuário não pode atribuir outro autor', status=403)
-            return
-
-        if user.role == UserRole.EDITOR:
-            allowed = set(user.allowed_category_slugs or [])
-            if category.allowed_roles and 'editor' in category.allowed_roles:
-                allowed.add(category.slug)
-            if category.slug not in allowed:
-                raise ApiError('FORBIDDEN', 'Editor não possui acesso a esta categoria', status=403)
             if author_id != user.id:
                 raise ApiError('FORBIDDEN', 'Usuário não pode atribuir outro autor', status=403)
             return
