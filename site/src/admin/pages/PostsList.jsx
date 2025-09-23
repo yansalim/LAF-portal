@@ -63,20 +63,10 @@ const PostsList = () => {
     await updatePostStatus(id, status, publicadoEm);
   };
 
-  const actions = (
-    <Link
-      to="/admin/posts/novo"
-      className="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
-    >
-      Novo post
-    </Link>
-  );
-
   return (
     <AdminLayout
       title="Publicações"
       description="Gerencie todo o conteúdo do portal."
-      actions={actions}
     >
       <section className="space-y-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">

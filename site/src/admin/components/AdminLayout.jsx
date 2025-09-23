@@ -20,25 +20,23 @@ const AdminLayout = ({ title, description, children, actions }) => {
 
   const closeMobileNav = () => setMobileNavOpen(false);
 
+  const hasHeaderContent = Boolean(title || description || actions);
+
   return (
-    <div className="relative flex min-h-screen bg-slate-100">
+    <div className="relative flex min-h-screen bg-slate-50">
       <AdminSidebar />
       <div className="flex min-h-screen flex-1 flex-col">
         <AdminHeader onToggleNav={toggleMobileNav} />
         <main className="flex-1 overflow-x-hidden px-3 py-6 sm:px-6">
           <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-            {(title || description || actions) && (
+            {hasHeaderContent && (
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-1">
                     {title && <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>}
                     {description && <p className="text-sm text-slate-500">{description}</p>}
                   </div>
-                  {actions && (
-                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                      {actions}
-                    </div>
-                  )}
+                  {actions && <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">{actions}</div>}
                 </div>
               </section>
             )}
