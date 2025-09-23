@@ -17,13 +17,6 @@ const formatDateTimeLocal = (value) => {
   return zoned.toISOString().slice(0, 16);
 };
 
-const parseDateTimeLocal = (value) => {
-  if (!value) return undefined;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return undefined;
-  return date.toISOString();
-};
-
 const defaultValues = {
   titulo: '',
   slug: '',
@@ -33,6 +26,8 @@ const defaultValues = {
   conteudoMarkdown: '',
   status: 'rascunho',
   publicadoEm: '',
+  publishedDate: '',
+  publishedTime: '',
   destaque: false,
 };
 
@@ -41,37 +36,48 @@ const PostForm = ({ initialValues, onSubmit }) => {
   const navigate = useNavigate();
   const { allowedCategories, currentUser } = useAppContext();
 
-  const resolvedInitialValues = useMemo(
-    () => ({
+  const resolvedInitialValues = useMemo(() => {
+    const base = {
       ...defaultValues,
       ...(initialValues || {}),
-      publicadoEm: initialValues?.publicadoEm
-        ? formatDateTimeLocal(initialValues.publicadoEm)
-        : '',
-    }),
-    [
-      initialValues?.id ?? null,
-      initialValues?.titulo ?? '',
-      initialValues?.slug ?? '',
-      initialValues?.resumo ?? '',
-      initialValues?.categoriaId ?? '',
-      initialValues?.capaUrl ?? '',
-      initialValues?.conteudoMarkdown ?? '',
-      initialValues?.status ?? '',
-      initialValues?.publicadoEm ?? '',
-      initialValues?.destaque ?? false,
-      initialValues?.categoriaNome ?? '',
-      initialValues?.autorId ?? '',
-      initialValues?.autorNome ?? '',
-    ],
-  );
+    };
+
+    if (initialValues?.publicadoEm) {
+      const localIso = formatDateTimeLocal(initialValues.publicadoEm);
+      if (localIso) {
+        const [datePart, timePart] = localIso.split('T');
+        base.publicadoEm = localIso;
+        base.publishedDate = datePart ?? '';
+        base.publishedTime = timePart ?? '';
+      }
+    }
+
+    return base;
+  }, [
+    initialValues?.id ?? null,
+    initialValues?.titulo ?? '',
+    initialValues?.slug ?? '',
+    initialValues?.resumo ?? '',
+    initialValues?.categoriaId ?? '',
+    initialValues?.capaUrl ?? '',
+    initialValues?.conteudoMarkdown ?? '',
+    initialValues?.status ?? '',
+    initialValues?.publicadoEm ?? '',
+    initialValues?.destaque ?? false,
+    initialValues?.categoriaNome ?? '',
+    initialValues?.autorId ?? '',
+    initialValues?.autorNome ?? '',
+  ]);
 
   const [form, setForm] = useState(resolvedInitialValues);
   const [errors, setErrors] = useState({});
 
-  const canPublish = form.status === 'publicado' || form.status === 'agendado';
+  const isPublished = form.status === 'publicado';
+  const isScheduled = form.status === 'agendado';
+  const canPublish = isPublished || isScheduled;
   const availableCategories = useMemo(() => allowedCategories, [allowedCategories]);
   const isSubmitDisabled = availableCategories.length === 0;
+  const minDate = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   useEffect(() => {
     if (!form.categoriaId && availableCategories.length > 0) {
@@ -81,6 +87,7 @@ const PostForm = ({ initialValues, onSubmit }) => {
 
   useEffect(() => {
     setForm(resolvedInitialValues);
+    setErrors({});
   }, [resolvedInitialValues]);
 
   const validate = () => {
@@ -89,8 +96,13 @@ const PostForm = ({ initialValues, onSubmit }) => {
     if (!form.resumo.trim()) nextErrors.resumo = 'Informe um resumo';
     if (!form.categoriaId) nextErrors.categoriaId = 'Selecione uma categoria';
 
-    if (canPublish && !form.publicadoEm) {
-      nextErrors.publicadoEm = 'Informe data e hora de publicação';
+    if (isScheduled) {
+      if (!form.publishedDate) {
+        nextErrors.publishedDate = 'Informe a data de publicação';
+      }
+      if (!form.publishedTime) {
+        nextErrors.publishedTime = 'Informe o horário de publicação';
+      }
     }
 
     if (form.categoriaId && availableCategories.length > 0) {
@@ -106,6 +118,22 @@ const PostForm = ({ initialValues, onSubmit }) => {
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
+    if (name === 'status') {
+      const nextStatus = value;
+      setForm((prev) => ({
+        ...prev,
+        [name]: nextStatus,
+        publishedDate: nextStatus === 'agendado' ? prev.publishedDate : '',
+        publishedTime: nextStatus === 'agendado' ? prev.publishedTime : '',
+      }));
+      if (nextStatus !== 'agendado') {
+        setErrors((prev) => {
+          const { publishedDate, publishedTime, ...rest } = prev;
+          return rest;
+        });
+      }
+      return;
+    }
     setForm((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -119,6 +147,28 @@ const PostForm = ({ initialValues, onSubmit }) => {
     const selectedCategory = availableCategories.find((category) => category.id === form.categoriaId);
     const slug = form.slug ? slugify(form.slug) : slugify(form.titulo);
 
+    let publishedAtIso;
+    if (isScheduled) {
+      const candidate = new Date(`${form.publishedDate}T${form.publishedTime}`);
+      if (Number.isNaN(candidate.getTime())) {
+        setErrors((prev) => ({
+          ...prev,
+          publishedDate: 'Data ou horário inválido',
+        }));
+        return;
+      }
+      if (candidate.getTime() < Date.now()) {
+        setErrors((prev) => ({
+          ...prev,
+          publishedDate: 'Defina data e hora a partir do momento atual',
+        }));
+        return;
+      }
+      publishedAtIso = candidate.toISOString();
+    } else if (isPublished) {
+      publishedAtIso = new Date().toISOString();
+    }
+
     const payload = {
       ...(initialValues || {}),
       ...form,
@@ -126,7 +176,7 @@ const PostForm = ({ initialValues, onSubmit }) => {
       categoriaNome: selectedCategory?.nome ?? initialValues?.categoriaNome,
       autorId: initialValues?.autorId ?? currentUser?.id,
       autorNome: initialValues?.autorNome ?? currentUser?.nome,
-      publicadoEm: canPublish ? parseDateTimeLocal(form.publicadoEm) : undefined,
+      publicadoEm: canPublish ? publishedAtIso : undefined,
     };
 
     await onSubmit(payload);
@@ -260,20 +310,41 @@ const PostForm = ({ initialValues, onSubmit }) => {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="publicadoEm" className="text-sm font-semibold text-slate-700">
-              Data de publicação
-            </label>
-            <input
-              id="publicadoEm"
-              name="publicadoEm"
-              type="datetime-local"
-              value={form.publicadoEm}
-              onChange={handleChange}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-            />
-            {errors.publicadoEm && <p className="mt-1 text-xs text-red-600">{errors.publicadoEm}</p>}
-          </div>
+          {isScheduled && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="publishedDate" className="text-sm font-semibold text-slate-700">
+                  Data de publicação
+                </label>
+                <input
+                  id="publishedDate"
+                  name="publishedDate"
+                  type="date"
+                  min={minDate}
+                  value={form.publishedDate}
+                  onChange={handleChange}
+                  disabled={!isScheduled}
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                />
+                {errors.publishedDate && <p className="mt-1 text-xs text-red-600">{errors.publishedDate}</p>}
+              </div>
+              <div>
+                <label htmlFor="publishedTime" className="text-sm font-semibold text-slate-700">
+                  Horário de publicação
+                </label>
+                <input
+                  id="publishedTime"
+                  name="publishedTime"
+                  type="time"
+                  value={form.publishedTime}
+                  onChange={handleChange}
+                  disabled={!isScheduled}
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                />
+                {errors.publishedTime && <p className="mt-1 text-xs text-red-600">{errors.publishedTime}</p>}
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center gap-2">
             <input
