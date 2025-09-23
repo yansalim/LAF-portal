@@ -66,12 +66,6 @@ const PublicHeader = ({ onSearch }) => {
               {category.nome}
             </NavLink>
           ))}
-          <NavLink
-            to="/login"
-            className="whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-600 transition hover:border-primary-500 hover:text-primary-600"
-          >
-            Acessar portal
-          </NavLink>
         </div>
       </div>
       {onSearch && (
